@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pillow CPR — Learn CPR in 2 minutes with a pillow and a webcam</title>
+<meta name="description" content="Pillow CPR coaches hands-only CPR through your webcam using a pillow as the practice dummy. Pose tracking counts your compressions and corrects your form out loud. Free, private, nothing to install.">
+<meta property="og:title" content="Pillow CPR">
+<meta property="og:description" content="Anyone can learn CPR in 2 minutes with a pillow. Your webcam is the coach.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/og-card.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#" id="brandHome" aria-label="Pillow CPR home">
+    <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="4" y="18" width="40" height="18" rx="9" fill="#ffffff" stroke="#d7263d" stroke-width="3"/>
+      <path d="M10 27h8l3-6 5 12 4-6h8" fill="none" stroke="#d7263d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="brand-name">Pillow<strong>CPR</strong></span>
+  </a>
+  <button id="emergencyBtnTop" class="btn btn-emergency-small" type="button">Emergency mode</button>
+</header>
+
+<main>
+
+  <!-- ============ HOME ============ -->
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <h1>Anyone can learn CPR<br>in <span class="accent">2 minutes</span> — with a pillow.</h1>
+      <p class="hero-sub">Put a pillow on the floor, kneel in front of your webcam, and press.
+        Pillow CPR watches your shoulders and wrists, counts every compression, and coaches
+        your rate and form <em>out loud</em> — no course, no cost, no install.</p>
+      <div class="hero-cta">
+        <button id="startPracticeBtn" class="btn btn-primary btn-big" type="button">Start the 2-minute practice</button>
+        <button id="startEmergencyBtn" class="btn btn-danger btn-big" type="button">Emergency mode</button>
+      </div>
+      <p class="hero-note">Camera stays on your device. No video is recorded, uploaded, or stored — pose tracking runs entirely in your browser.</p>
+    </div>
+
+    <div class="stat-strip" role="list" aria-label="Why this matters">
+      <div class="stat" role="listitem">
+        <span class="stat-num">2–3×</span>
+        <span class="stat-text">Immediate CPR can <strong>double or triple</strong> a cardiac arrest victim’s chance of survival.</span>
+      </div>
+      <div class="stat" role="listitem">
+        <span class="stat-num">100–120</span>
+        <span class="stat-text">Compressions per minute is the target rate — about two pushes every second.</span>
+      </div>
+      <div class="stat" role="listitem">
+        <span class="stat-num">~90%</span>
+        <span class="stat-text">Of people who suffer cardiac arrest outside a hospital die — most never get CPR in time.</span>
+      </div>
+    </div>
+    <p class="stat-source">Source: American Heart Association, Hands-Only CPR fact sheet (heart.org).</p>
+
+    <div class="how">
+      <h2>How it works</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <span class="how-step">1</span>
+          <h3>Set up</h3>
+          <p>Pillow on the floor. Kneel behind it, laptop in front of you, hands stacked in the centre of the pillow, shoulders over your hands.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-step">2</span>
+          <h3>Press to the coach</h3>
+          <p>Pose tracking follows the up-and-down cycle of your wrists. The voice coach corrects you live: <em>“faster,” “lock your elbows,” “let it come all the way up.”</em></p>
+        </div>
+        <div class="how-card">
+          <span class="how-step">3</span>
+          <h3>Get your score</h3>
+          <p>After 2 minutes: a score for rate, consistency and arm form — and a shareable card that says you practiced.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="limits">
+      <h2>Honest limits</h2>
+      <ul>
+        <li><strong>This is a practice tool, not a medical device and not a certification.</strong> Take a certified course — the American Heart Association and the Heart and Stroke Foundation run them everywhere.</li>
+        <li>A webcam measures <strong>rate and arm form reliably</strong>. True compression depth can’t be measured from a flat camera image, so Pillow CPR shows press depth as a <strong>rough estimate only</strong>.</li>
+        <li>In a real emergency: <strong>call 911 first</strong>, then push hard and fast in the centre of the chest. Emergency mode is built for exactly that moment.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SETUP ============ -->
+  <section id="view-setup" class="view">
+    <h2 class="view-title">Get in position</h2>
+    <div class="setup-grid">
+      <div class="cam-wrap">
+        <video id="inputVideo" playsinline muted></video>
+        <canvas id="overlayCanvas" width="640" height="480"></canvas>
+        <div id="camMessage" class="cam-message">Starting your camera…</div>
+      </div>
+      <div class="setup-side">
+        <ol class="setup-steps">
+          <li>Pillow flat on the floor in front of the laptop.</li>
+          <li>Kneel behind the pillow, hands stacked in its centre.</li>
+          <li>Shoulders directly over your hands, arms straight.</li>
+          <li>You should see your shoulders and hands in the frame.</li>
+        </ol>
+        <ul class="frame-checks" aria-label="Framing checks">
+          <li id="checkShoulders"><span class="dot"></span> Shoulders in view</li>
+          <li id="checkWrists"><span class="dot"></span> Hands / wrists in view</li>
+          <li id="checkFraming"><span class="dot"></span> Far enough back — upper body fits</li>
+        </ul>
+        <div class="setup-actions">
+          <button id="beginSessionBtn" class="btn btn-primary btn-big" type="button" disabled>Begin 2-minute session</button>
+          <button id="demoModeBtn" class="btn btn-ghost" type="button">No camera? Use demo mode (tap / spacebar)</button>
+          <button class="btn btn-link back-home" type="button">← Back</button>
+        </div>
+        <p class="setup-note">Nothing leaves your device: the pose model runs in this tab and frames are never sent anywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRACTICE ============ -->
+  <section id="view-practice" class="view">
+    <div class="practice-top">
+      <div class="timer-wrap" aria-label="Time left">
+        <span id="timerText">2:00</span>
+        <div class="timer-bar"><div id="timerFill"></div></div>
+      </div>
+      <div class="toggles">
+        <label class="toggle"><input type="checkbox" id="voiceToggle" checked> Voice coach</label>
+        <label class="toggle"><input type="checkbox" id="metroToggle"> Metronome (110)</label>
+        <button id="endSessionBtn" class="btn btn-ghost" type="button">End session</button>
+      </div>
+    </div>
+
+    <div id="feedbackBanner" class="feedback-banner" role="status" aria-live="polite">Press when you’re ready — aim for the green zone.</div>
+
+    <div class="hud">
+      <div class="hud-main">
+        <div class="bpm-block">
+          <span id="bpmValue" class="bpm-value">—</span>
+          <span class="bpm-label">compressions / min</span>
+        </div>
+        <div class="gauge" aria-hidden="true">
+          <div class="gauge-track">
+            <div class="gauge-zone"></div>
+            <div id="gaugeNeedle" class="gauge-needle"></div>
+          </div>
+          <div class="gauge-scale"><span>60</span><span>100</span><span>120</span><span>160</span></div>
+        </div>
+        <div class="hud-stats">
+          <div class="hud-stat"><span id="countValue" class="hud-stat-num">0</span><span class="hud-stat-label">compressions</span></div>
+          <div class="hud-stat"><span id="depthValue" class="hud-stat-num">—</span><span class="hud-stat-label">press estimate*</span></div>
+          <div class="hud-stat"><span id="formValue" class="hud-stat-num">—</span><span class="hud-stat-label">arms locked</span></div>
+        </div>
+        <p class="hud-footnote">*Rough estimate from wrist travel — a webcam can’t measure true depth.</p>
+        <button id="tapPad" class="tap-pad" type="button" hidden>Tap here (or press SPACE) for each compression</button>
+      </div>
+      <div class="hud-cam">
+        <video id="practiceVideo" playsinline muted></video>
+        <canvas id="practiceCanvas" width="640" height="480"></canvas>
+        <div id="practiceCamMsg" class="cam-message small">Camera preview</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <section id="view-results" class="view">
+    <h2 class="view-title">Your 2 minutes, scored</h2>
+    <div class="score-grid">
+      <div class="score-card overall">
+        <span id="overallScore" class="score-num">—</span>
+        <span class="score-label">overall</span>
+        <p id="overallMessage" class="score-msg"></p>
+      </div>
+      <div class="score-card">
+        <span id="rateScore" class="score-num">—</span>
+        <span class="score-label">rate</span>
+        <p class="score-detail" id="rateDetail"></p>
+      </div>
+      <div class="score-card">
+        <span id="consistencyScore" class="score-num">—</span>
+        <span class="score-label">consistency</span>
+        <p class="score-detail" id="consistencyDetail"></p>
+      </div>
+      <div class="score-card">
+        <span id="formScore" class="score-num">—</span>
+        <span class="score-label">arm form</span>
+        <p class="score-detail" id="formDetail"></p>
+      </div>
+    </div>
+    <p id="sessionMeta" class="session-meta"></p>
+
+    <div class="cert-block">
+      <h3>Your practice card</h3>
+      <label class="name-label" for="certName">Name on the card (optional)</label>
+      <input id="certName" class="name-input" type="text" maxlength="40" placeholder="Your name" autocomplete="name">
+      <canvas id="certCanvas" width="1200" height="800"></canvas>
+      <div class="cert-actions">
+        <button id="downloadCertBtn" class="btn btn-primary" type="button">Download the card (PNG)</button>
+        <button id="againBtn" class="btn btn-ghost" type="button">Practice again</button>
+        <button class="btn btn-link back-home" type="button">Home</button>
+      </div>
+      <p class="cert-note">A practice card, not a certification. For the real credential, take a certified CPR course.</p>
+    </div>
+  </section>
+
+  <!-- ============ EMERGENCY ============ -->
+  <section id="view-emergency" class="view emergency">
+    <div class="emg-call">
+      <span class="emg-call-big">CALL 911</span>
+      <span class="emg-call-sub">Put the phone on speaker. Send someone for an AED if one is nearby.</span>
+    </div>
+    <div class="emg-body">
+      <div id="emgPulse" class="emg-pulse"><span id="emgCount">0</span></div>
+      <p class="emg-instruction">Push hard and fast in the centre of the chest.<br>Follow the beat — 110 per minute. Don’t stop until help takes over or the person breathes.</p>
+      <div class="emg-controls">
+        <button id="emgStartBtn" class="btn btn-light btn-big" type="button">Start metronome</button>
+        <label class="toggle light"><input type="checkbox" id="emgCountToggle" checked> Count my compressions (camera or tap)</label>
+      </div>
+      <button id="emgTapPad" class="tap-pad light" type="button">Tap for each compression (or press SPACE)</button>
+      <div class="emg-cam">
+        <video id="emgVideo" playsinline muted></video>
+        <canvas id="emgCanvas" width="640" height="480"></canvas>
+      </div>
+      <button class="btn btn-link light back-home" type="button">← Exit emergency mode</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p><strong>Pillow CPR</strong> is a free practice tool built for learning — not a medical device and not a substitute for certified CPR training.
+  In an emergency, call 911 (North America) or your local emergency number. Statistics: American Heart Association (heart.org).
+  Pose tracking by MediaPipe runs locally in your browser; no video ever leaves your device.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
