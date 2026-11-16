@@ -1,12 +1,12 @@
 # Pillow CPR
 
-**Anyone can learn CPR in 2 minutes — with a pillow.**
+**Anyone can learn CPR in 2 minutes, with a pillow.**
 
 ![Pillow CPR hero](assets/hero-banner.png)
 
 Pillow CPR is a browser app that coaches hands-only CPR through your webcam, using a
 pillow as the practice dummy. Pose tracking follows your shoulders and wrists, counts
-every compression in real time, and corrects you out loud — *"faster," "lock your
+every compression in real time, and corrects you out loud: *"faster," "lock your
 elbows," "let it come all the way up."* A 2-minute session ends with a score for rate,
 consistency and arm form, plus a shareable practice card. A separate emergency mode
 skips the scoring: it says **call 911**, then runs a loud 110-beat metronome and counts
@@ -14,7 +14,7 @@ your compressions while you work.
 
 **▶ Live demo: https://alenzacodes.github.io/pillow-cpr/**
 
-No install, no account, no backend. Your camera feed never leaves your device — the
+No install, no account, no backend. Your camera feed never leaves your device. The
 pose model runs entirely in your browser tab.
 
 ---
@@ -25,7 +25,7 @@ Most people have never practiced CPR, and when someone collapses, bystanders fre
 push too slowly. A course takes hours and money; a pillow and a laptop camera are free.
 
 - Immediate CPR can **double or triple** a cardiac arrest victim's chance of survival.
-- Only about **1 in 10** people who suffer cardiac arrest outside a hospital survive —
+- Only about **1 in 10** people who suffer cardiac arrest outside a hospital survive;
   most never receive CPR in time.
 - The target is **100–120 compressions per minute**, arms straight, letting the chest
   come all the way back up between pushes.
@@ -34,17 +34,17 @@ push too slowly. A course takes hours and money; a pillow and a laptop camera ar
 
 ## What it does
 
-1. **Set up** — pillow on the floor, kneel behind it, laptop in front. Live framing
+1. **Set up**: pillow on the floor, kneel behind it, laptop in front. Live framing
    checks confirm your shoulders and hands are in view.
-2. **Practice (2 minutes, scored)** — MediaPipe Pose tracks your wrists; the
+2. **Practice (2 minutes, scored)**: MediaPipe Pose tracks your wrists; the
    up-and-down cycle of wrist position becomes the compression count. A voice coach
    (Web Speech API) corrects rate, elbow lock and recoil live, with a big on-screen
    rate gauge whose green zone is 100–120/min.
-3. **Score + practice card** — rate, consistency and arm form scored out of 100, and a
+3. **Score + practice card**: rate, consistency and arm form scored out of 100, and a
    certificate-style PNG card you can download and share.
-4. **Emergency mode** — "CALL 911" first, then a loud WebAudio metronome at 110 BPM, a
+4. **Emergency mode**: "CALL 911" first, then a loud WebAudio metronome at 110 BPM, a
    giant compression counter, and a spoken count every 10 compressions.
-5. **Demo mode** — no camera? Tap or press the spacebar per compression; the same
+5. **Demo mode**: no camera? Tap or press the spacebar per compression; the same
    coaching and scoring pipeline runs. (Built for judges, classrooms, and the shy.)
 
 ## How the counting works
@@ -67,7 +67,7 @@ push too slowly. A course takes hours and money; a pillow and a laptop camera ar
 ## Honest limits
 
 - **This is a practice tool, not a medical device, and the card is not a
-  certification.** Take a certified course — the American Heart Association and the
+  certification.** Take a certified course: the American Heart Association and the
   Heart and Stroke Foundation run them everywhere.
 - A webcam measures **rate and arm form reliably**. True compression **depth cannot be
   measured** from a flat camera image, so the app shows press depth as a *rough
@@ -77,7 +77,7 @@ push too slowly. A course takes hours and money; a pillow and a laptop camera ar
 
 ## Tech
 
-- Vanilla HTML/CSS/JavaScript — no build step, no framework, no backend.
+- Vanilla HTML/CSS/JavaScript: no build step, no framework, no backend.
 - [MediaPipe Pose](https://developers.google.com/mediapipe) (CDN) for on-device pose tracking.
 - Web Speech API for the voice coach · WebAudio API for the metronome.
 - Canvas API for the score card · GitHub Pages for hosting.
@@ -86,7 +86,7 @@ push too slowly. A course takes hours and money; a pillow and a laptop camera ar
 
 ```bash
 python3 -m http.server 8000
-# open http://localhost:8000  (camera requires localhost or HTTPS — both fine)
+# open http://localhost:8000  (camera requires localhost or HTTPS; both work)
 ```
 
 Then click **Start the 2-minute practice**, allow the camera, and press a pillow.
@@ -99,8 +99,27 @@ Then click **Start the 2-minute practice**, allow the camera, and press a pillow
 
 ## Built for
 
-Next Byte Hacks V5 (Devpost) — solo build. Judging criterion: **Impact**.
+Next Byte Hacks V5 (Devpost), solo build. Judging criterion: **Impact**.
+
+## Project structure
+
+```text
+pillow-cpr/
+├── assets/                       # Favicon and screenshots
+│   ├── favicon.svg
+│   ├── screenshot-emergency.png
+│   ├── screenshot-practice.png
+│   └── screenshot-results.png
+├── docs/                         # Image production notes
+│   └── IMAGE-COMMANDS.md
+├── .nojekyll
+├── app.js                        # Interface logic
+├── index.html                    # Page markup
+├── LICENSE                       # Licence
+├── README.md                     # This file
+└── styles.css                    # Styles
+```
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Learn CPR, then teach someone else.
+MIT. See [LICENSE](LICENSE). Learn CPR, then teach someone else.
