@@ -1,4 +1,4 @@
-/* Pillow CPR — app.js
+/* Pillow CPR: app.js
    All client-side. Pose tracking (MediaPipe) runs locally; no video leaves the device.
    Sections: helpers · speech · metronome · compression signal processor · pose engine ·
              practice session + scoring + certificate · emergency mode · wiring        */
@@ -202,7 +202,7 @@ function framing(lm) {
 /* ================= camera + pose engine ================= */
 const PoseEngine = {
   pose: null, stream: null, running: false, sending: false,
-  onLandmarks: null,           // callback(landmarks) — routed by the active view
+  onLandmarks: null,           // callback(landmarks), routed by the active view
   drawTargets: [],             // [{video, canvas}] drawn when their view is active
   cameraError: null,
 
